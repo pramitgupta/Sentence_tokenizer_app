@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
 import nltk
-
 from nltk.tokenize import sent_tokenize
 
-# Download necessary tokenizer
+# Download tokenizer if needed
 nltk.download('punkt')
 
 st.title("CSV Column Sentence Filter App")
@@ -15,9 +14,12 @@ wordlist_file = st.file_uploader("Upload a wordlist (one word per line)", type=[
 
 if csv_file and wordlist_file:
     df = pd.read_csv(csv_file)
-    st.subheader("Select the column to process")
 
-    selected_col = st.selectbox("Choose a column containing text", df.columns)
+    # Filter out unnamed columns
+    valid_columns = [col for col in df.columns if not col.strip().lower().startswith("unnamed")]
+
+    st.subheader("Select the column to process")
+    selected_col = st.selectbox("Choose a column containing text", valid_columns)
 
     if selected_col:
         # Clean wordlist
@@ -28,7 +30,6 @@ if csv_file and wordlist_file:
         total_sentences = 0
         filtered_sentences = 0
 
-        # Iterate using correct row index
         for true_idx, row in df.iterrows():
             text = row[selected_col]
             if pd.notna(text):
@@ -40,16 +41,13 @@ if csv_file and wordlist_file:
                         matched_rows.append((true_idx, sent))
                         filtered_sentences += 1
 
-        # Show counts
         st.markdown(f"**Total sentences in column:** {total_sentences}")
         st.markdown(f"**Filtered sentences matched:** {filtered_sentences}")
 
-        # Output
         result_df = pd.DataFrame(matched_rows, columns=["Row Index", "Matched Sentence"])
         st.subheader("Filtered Sentences")
         st.dataframe(result_df)
 
-        # Download
         csv_output = result_df.to_csv(index=False).encode('utf-8')
         st.download_button(
             label="Download Filtered Sentences as CSV",
