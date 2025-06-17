@@ -4,22 +4,21 @@ import nltk
 
 from nltk.tokenize import sent_tokenize
 
-# Ensure punkt is available
+# Ensure NLTK data is available
 nltk.download('punkt')
 
 st.title("CSV Column Sentence Filter App")
 
-# Upload CSV file
+# Upload CSV and wordlist
 csv_file = st.file_uploader("Upload a CSV file", type=["csv"])
 wordlist_file = st.file_uploader("Upload a wordlist (one word per line)", type=["txt"])
 
-# Process if both files are uploaded
 if csv_file and wordlist_file:
-    # Read the CSV
+    # Read CSV
     df = pd.read_csv(csv_file)
     st.subheader("Select the column to process")
-    
-    # Dropdown for column selection
+
+    # Selectbox for column
     selected_col = st.selectbox("Choose a column containing text", df.columns)
 
     if selected_col:
@@ -28,20 +27,28 @@ if csv_file and wordlist_file:
         wordlist = [word.strip().lower() for word in wordlist if word.strip()]
 
         matched_rows = []
+        total_sentences = 0
+        filtered_sentences = 0
 
-        # Go through each row, tokenize, and filter
+        # Process each row
         for idx, cell in df[selected_col].dropna().items():
             sentences = sent_tokenize(str(cell))
+            total_sentences += len(sentences)
+
             for sent in sentences:
                 sent_lower = sent.lower()
                 if any(word in sent_lower for word in wordlist):
                     matched_rows.append((idx, sent))
+                    filtered_sentences += 1
+
+        # Display counts
+        st.markdown(f"**Total sentences in column:** {total_sentences}")
+        st.markdown(f"**Filtered sentences matched:** {filtered_sentences}")
 
         # Create output DataFrame
         result_df = pd.DataFrame(matched_rows, columns=["Row Index", "Matched Sentence"])
 
         st.subheader("Filtered Sentences")
-        st.write(f"{len(result_df)} matched sentence(s) found.")
         st.dataframe(result_df)
 
         # Download button
