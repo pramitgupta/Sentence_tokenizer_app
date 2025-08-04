@@ -5,7 +5,7 @@ from nltk.tokenize import sent_tokenize
 
 nltk.download('punkt')
 
-st.title("Tokenize 'extr_sents_pr' by prim_key")
+st.title("Tokenize and Filter 'extr_sents_pr' by prim_key (≥ 5 words)")
 
 # Upload CSV
 csv_file = st.file_uploader("Upload a CSV file", type=["csv"])
@@ -23,19 +23,21 @@ if csv_file:
             if pd.notna(text):
                 sentences = sent_tokenize(str(text))
                 for sent in sentences:
-                    results.append((prim_key, sent))
+                    word_count = len(sent.split())
+                    if word_count >= 5:
+                        results.append((prim_key, sent))
 
         # Display result
         result_df = pd.DataFrame(results, columns=["prim_key", "Tokenized Sentence"])
-        st.subheader("Tokenized Sentences from 'extr_sents_pr'")
+        st.subheader("Tokenized Sentences (≥ 5 words)")
         st.dataframe(result_df)
 
         # Download option
         csv_output = result_df.to_csv(index=False).encode('utf-8')
         st.download_button(
-            label="Download Tokenized Sentences as CSV",
+            label="Download Filtered Sentences as CSV",
             data=csv_output,
-            file_name="tokenized_extr_sents_pr.csv",
+            file_name="filtered_tokenized_extr_sents_pr.csv",
             mime="text/csv"
         )
     else:
