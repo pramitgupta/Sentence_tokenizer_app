@@ -5,7 +5,7 @@ from nltk.tokenize import sent_tokenize
 
 nltk.download('punkt')
 
-st.title("Tokenize and Filter 'extr_sents_pr' by prim_key (≥ 5 words)")
+st.title("Tokenize and Filter 'extr_sents_pr' by prim_key (≥ 8 words)")
 
 # Upload CSV
 csv_file = st.file_uploader("Upload a CSV file", type=["csv"])
@@ -24,7 +24,7 @@ if csv_file:
                 sentences = sent_tokenize(str(text))
                 for sent in sentences:
                     word_count = len(sent.split())
-                    if word_count >= 5:
+                    if word_count >= 8:
                         results.append((prim_key, sent))
 
         # Display result
@@ -42,3 +42,4 @@ if csv_file:
         )
     else:
         st.error("The CSV must contain both 'prim_key' and 'extr_sents_pr' columns.")
+
