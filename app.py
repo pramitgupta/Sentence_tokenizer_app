@@ -29,7 +29,7 @@ if csv_file:
 
         # Display result
         result_df = pd.DataFrame(results, columns=["prim_key", "Tokenized Sentence"])
-        st.subheader("Tokenized Sentences (≥ 5 words)")
+        st.subheader("Tokenized Sentences (≥ 8 words)")
         st.dataframe(result_df)
 
         # Download option
@@ -42,4 +42,5 @@ if csv_file:
         )
     else:
         st.error("The CSV must contain both 'prim_key' and 'extr_sents_pr' columns.")
+
 
